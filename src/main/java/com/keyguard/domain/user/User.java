@@ -1,6 +1,8 @@
 package com.keyguard.domain.user;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,8 +18,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Document(collection = "users")
 public class User {
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
+  @MongoId(FieldType.OBJECT_ID)
+  //@GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
   private String name;
