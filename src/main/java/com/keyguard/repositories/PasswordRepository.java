@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.keyguard.domain.password.Password;
 
 @Repository
-public interface PasswordRepository  extends MongoRepository<Password, String> {
+public interface PasswordRepository extends MongoRepository<Password, String> {
   Optional<Password> findByApplication(String application);
 
   //@Query("{ 'user' : ?0 }")
