@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.keyguard.domain.exceptions.password.PasswordNotFoundException;
 import com.keyguard.domain.exceptions.user.UserNotFoundException;
 
 @ControllerAdvice
@@ -18,6 +19,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
 
   @ExceptionHandler(UserNotFoundException.class)
   private ResponseEntity<RestErrorMessage> userNotFoundHandler(UserNotFoundException exception){
+
+    RestErrorMessage error = new RestErrorMessage(HttpStatus.NOT_FOUND, exception.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+  }
+
+  @ExceptionHandler(PasswordNotFoundException.class)
+  private ResponseEntity<RestErrorMessage> passwordNotFoundHandler(PasswordNotFoundException exception){
 
     RestErrorMessage error = new RestErrorMessage(HttpStatus.NOT_FOUND, exception.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.keyguard.domain.exceptions.password.PasswordNotFoundException;
 import com.keyguard.domain.exceptions.user.UserNotFoundException;
 import com.keyguard.domain.password.Password;
 import com.keyguard.domain.user.User;
@@ -54,7 +55,6 @@ public class PasswordController {
       return ResponseEntity.ok(passwords);
     }
 
-
     passwords = this.repository.findByUserId(new ObjectId(user.getId()));
     return ResponseEntity.ok(passwords);
   }
@@ -62,28 +62,28 @@ public class PasswordController {
   @GetMapping("/{application}")
   public ResponseEntity getPasswordByApplication(@PathVariable String application){
 
-    Password password = this.repository.findByApplication(application).orElseThrow(() -> new UserNotFoundException("User not found"));;
+    Password password = this.repository.findByApplication(application).orElseThrow(() -> new PasswordNotFoundException("Password not found"));
 
     return ResponseEntity.ok(password);
   }
 
   @PostMapping("/")
   public ResponseEntity register(@Valid @RequestBody PasswordRequestDTO body){
-    //Optional<User> user = this.userRepository.findById(body.userId());
+    List<Password> passwords = this.repository.findByUserIdAndApplication(new ObjectId(body.userId()), body.application());
+    
+    Optional<User> user = this.userRepository.findById(body.userId());
 
-    //if(user.isEmpty()) return ResponseEntity.badRequest().build();
+    if(user.isEmpty()) return ResponseEntity.badRequest().build();
 
-    Optional<Password> pass = this.repository.findByApplication(body.application());
-
-    if(pass.isEmpty()) {
+    if(passwords.isEmpty()) {
       Password newPass = new Password();
-        newPass.setPassword(passwordEncoder.encode(body.password()));
-        newPass.setApplication(body.application());
-        //newPass.setUser(user);
+      newPass.setPassword(passwordEncoder.encode(body.password()));
+      newPass.setApplication(body.application());
+      newPass.setUser(user.get());
 
-        this.repository.save(newPass);
-        
-        return ResponseEntity.ok(new PasswordResponseDTO(newPass.getApplication()));
+      this.repository.save(newPass);
+      
+      return ResponseEntity.ok(new PasswordResponseDTO(newPass.getApplication()));
     }
 
     return ResponseEntity.badRequest().build();
